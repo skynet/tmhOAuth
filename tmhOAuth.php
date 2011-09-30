@@ -7,9 +7,9 @@
  * REST requests. OAuth authentication is sent using the an Authorization Header.
  *
  * @author themattharris
- * @version 0.53
+ * @version 0.55
  *
- * 15 July 2011
+ * 29 September 2011
  */
 class tmhOAuth {
   /**
@@ -26,6 +26,7 @@ class tmhOAuth {
     // default configuration options
     $this->config = array_merge(
       array(
+        'user_agent'                 => 'tmhOAuth 0.54 - //github.com/themattharris/tmhOAuth',
         'consumer_key'               => '',
         'consumer_secret'            => '',
         'user_token'                 => '',
@@ -49,6 +50,7 @@ class tmhOAuth {
         // support for proxy servers
         'curl_proxy'                 => false, // really you don't want to use this if you are using streaming
         'curl_proxyuserpwd'          => false, // format username:password for proxy, if required
+        'curl_encoding'              => '',    // leave blank for all supported formats, else use gzip, deflate, identity
 
         // streaming API
         'is_streaming'               => false,
@@ -527,18 +529,21 @@ class tmhOAuth {
 
     // configure curl
     $c = curl_init();
-    curl_setopt($c, CURLOPT_USERAGENT, "themattharris' HTTP Client");
-    curl_setopt($c, CURLOPT_CONNECTTIMEOUT, $this->config['curl_connecttimeout']);
-    curl_setopt($c, CURLOPT_TIMEOUT, $this->config['curl_timeout']);
-    curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($c, CURLOPT_SSL_VERIFYPEER, $this->config['curl_ssl_verifypeer']);
-    curl_setopt($c, CURLOPT_FOLLOWLOCATION, $this->config['curl_followlocation']);
-    curl_setopt($c, CURLOPT_PROXY, $this->config['curl_proxy']);
-    curl_setopt($c, CURLOPT_URL, $this->url);
-    // process the headers
-    curl_setopt($c, CURLOPT_HEADERFUNCTION, array($this, 'curlHeader'));
-    curl_setopt($c, CURLOPT_HEADER, FALSE);
-    curl_setopt($c, CURLINFO_HEADER_OUT, true);
+    curl_setopt_array($c, array(
+      CURLOPT_USERAGENT      => $this->config['user_agent'],
+      CURLOPT_CONNECTTIMEOUT => $this->config['curl_connecttimeout'],
+      CURLOPT_TIMEOUT        => $this->config['curl_timeout'],
+      CURLOPT_RETURNTRANSFER => TRUE,
+      CURLOPT_SSL_VERIFYPEER => $this->config['curl_ssl_verifypeer'],
+      CURLOPT_FOLLOWLOCATION => $this->config['curl_followlocation'],
+      CURLOPT_PROXY          => $this->config['curl_proxy'],
+      CURLOPT_ENCODING       => $this->config['curl_encoding'],
+      CURLOPT_URL            => $this->url,
+      // process the headers
+      CURLOPT_HEADERFUNCTION => array($this, 'curlHeader'),
+      CURLOPT_HEADER         => FALSE,
+      CURLINFO_HEADER_OUT    => true,
+    ));
 
     if ($this->config['curl_proxyuserpwd'] !== false)
       curl_setopt($c, CURLOPT_PROXYUSERPWD, $this->config['curl_proxyuserpwd']);

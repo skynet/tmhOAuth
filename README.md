@@ -35,6 +35,13 @@ the library can be used. Each example contains instructions on how to use it
 
 ## Change History
 
+### 0.55 - 29 September 2011
+- Added support for content encoding. Defaults to whatever localhost supports. Props: yusuke
+
+### 0.54 - 29 September 2011
+- User-Agent is now configurable and includes the current version number of the script
+- Updated the Streaming examples to use SSL
+
 ### 0.53 - 15 July 2011
 - Fixed issue where headers were being duplicated if the library was called more than once.
 - Updated examples to fit the new location of access tokens and secrets on dev.twitter.com
